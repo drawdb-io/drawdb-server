@@ -50,13 +50,12 @@ app.use(
   })
 );
 
-app.post("/report_bug", async (req, res) => {
+app.post("/send_email", async (req, res) => {
   const { subject, message, attachments } = req.body;
-  console.log(req.bodyparser);
 
   try {
     await sendEmail(
-      `[BUG REPORT] : ${subject}`,
+      subject,
       `<html><head>${emailStyles}</head><body>${message}</body></html>`,
       process.env.EMAIL_REPORT,
       process.env.EMAIL_USER,
