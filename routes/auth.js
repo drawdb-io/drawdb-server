@@ -59,23 +59,27 @@ authRouter.get("/confirm/:token", async (req, res) => {
       token: req.params.token,
     });
 
-    if (!token) res.status(400).json({ message: "Token not found." });
+    if (!token)
+      res.status(400).sendFile(path.join(__dirname, "../pages/error.html"));
 
     const decryptedUserId = cryptr.decrypt(token.token);
     if (decryptedUserId !== token.userId)
-      res.status(400).json({ message: "Invalid token." });
+      res.status(400).sendFile(path.join(__dirname, "../pages/error.html"));
 
     await UserModel.updateOne(
       { _id: token.userId },
       { $set: { verified: true } }
     );
-    console.log(token);
+
     await TokenModel.findByIdAndRemove(token._id);
+
     res
       .status(200)
       .sendFile(path.join(__dirname, "../pages/account_verified.html"));
   } catch (e) {
-    res.status(400).json({ error: "e" });
+    res
+      .status(500)
+      .sendFile(path.join(__dirname, "../pages/error.html"));
   }
 });
 
