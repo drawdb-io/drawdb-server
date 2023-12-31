@@ -1,7 +1,14 @@
 const express = require("express");
 const authRouter = express.Router();
 const bcrypt = require("bcryptjs");
+const path = require("path");
+const Cryptr = require("cryptr");
+
 const UserModel = require("../models/user");
+const TokenModel = require("../models/token");
+const sendEmail = require("../utils/sendEmail");
+
+const cryptr = new Cryptr(process.env.ENCRYPTION_KEY);
 
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -20,13 +27,55 @@ authRouter.post("/signup", async (req, res) => {
       username,
       email,
       password: hashedPass,
+      verified: false,
     });
 
     await user.save();
 
-    res.status(200).json({ message: "Successfully sign up." });
+    const token = new TokenModel({
+      userId: user._id.toString(),
+      token: cryptr.encrypt(user._id.toString()),
+    });
+
+    await token.save();
+
+    const link = `${process.env.SERVER_URL}:${process.env.PORT}/confirm/${token.token}`;
+    sendEmail(
+      "Verify Email Address",
+      `<a href="${link}">Click to verify</a>`,
+      email,
+      process.env.EMAIL_USER
+    );
+
+    res.status(200).json({ message: "Successfully sign up.", user: user });
   } catch (e) {
     res.status(500).json({ error: e });
+  }
+});
+
+authRouter.get("/confirm/:token", async (req, res) => {
+  try {
+    const token = await TokenModel.findOne({
+      token: req.params.token,
+    });
+
+    if (!token) res.status(400).json({ message: "Token not found." });
+
+    const decryptedUserId = cryptr.decrypt(token.token);
+    if (decryptedUserId !== token.userId)
+      res.status(400).json({ message: "Invalid token." });
+
+    await UserModel.updateOne(
+      { _id: token.userId },
+      { $set: { verified: true } }
+    );
+    console.log(token);
+    await TokenModel.findByIdAndRemove(token._id);
+    res
+      .status(200)
+      .sendFile(path.join(__dirname, "../public/account_verified.html"));
+  } catch (e) {
+    res.status(400).json({ error: "e" });
   }
 });
 
@@ -38,6 +87,10 @@ authRouter.post("/login", async (req, res) => {
 
     if (!user) {
       res.status(400).json({ message: "No user by this email found." });
+    }
+
+    if (!user.verified) {
+      res.status(400).json({ message: "Account not verified." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
