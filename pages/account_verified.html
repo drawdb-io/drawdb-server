@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account verified | drawDB</title>
+    <link rel="icon" type="image/x-icon" href="http://localhost:5000/favicon.ico">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                screens: {
+                    '3xl': { 'max': '2047px' },
+                    '2xl': { 'max': '1535px' },
+                    'xl': { 'min': '1024px' },
+                    'lg': { 'max': '1023px' },
+                    'md': { 'max': '820px' },
+                    'sm': { 'max': '639px' }
+                },
+                extend: {}
+            },
+        }
+    </script>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <div class="sm:py-3 py-5 px-12 xl:px-20 sm:px-6 flex justify-between items-center select-none">
+        <div class="flex items-center justify-start">
+            <img src="http://localhost:5000/logo_light_46.png" alt="logo" class="me-2 sm:h-[28px] h-[46px]" />
+            <div class="ms-4 sm:text-sm xl:text-xl text-lg font-semibold">
+                Account Verification
+            </div>
+        </div>
+    </div>
+    <hr class="border-zinc-300" />
+    <div class="px-48 py-8 sm:px-8 md:px-12 flex-grow">
+        <div class="bg-blue-100 rounded-md border border-blue-400 p-5">
+            <div class="text-lg font-bold mb-1 sm:text-md">Welcome aboard!</div>
+            <div class="mb-1 sm:text-sm">Your email has been successfully verified. We're happy to have you here.</div>
+            <div class="mb-1 sm:text-sm">You can now log in with your new account <a href="http://localhost:5173/login"
+                    class="text-blue-600 font-semibold hover:underline">here</a>.</div>
+            <div class="mt-5 mb-1 sm:text-sm">If you have any questions feel free to contact us.</div>
+            <div class="flex sm:block gap-8">
+                <div
+                    class="flex items-center gap-2 text-zinc-900 font-semibold hover:text-blue-600 hover:underline transition-all duration-300 sm:text-sm">
+                    <i class="bi bi-discord text-lg"></i>
+                    <a href="https://discord.com/">Join us on Discord</a>
+                </div>
+                <div
+                    class="flex items-center gap-2 text-zinc-900 font-semibold hover:text-blue-600 hover:underline transition-all duration-300 sm:text-sm">
+                    <i class="bi bi-envelope-fill text-lg"></i>
+                    <a>Send us an email</a>
+                </div>
+                <div
+                    class="flex items-center gap-2 text-zinc-900 font-semibold hover:text-blue-600 hover:underline transition-all duration-300 sm:text-sm sm:mt-1">
+                    <i class="bi bi-twitter-x"></i>
+                    <a href="https://twitter.com">Follow us on Twitter</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr class="border-zinc-300 my-1" />
+    <div class="text-center text-sm py-3">
+        &copy; 2024 <strong>drawDB</strong> - All right reserved.
+    </div>
+</body>
+
+</html>

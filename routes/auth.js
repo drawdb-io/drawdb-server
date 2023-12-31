@@ -73,7 +73,7 @@ authRouter.get("/confirm/:token", async (req, res) => {
     await TokenModel.findByIdAndRemove(token._id);
     res
       .status(200)
-      .sendFile(path.join(__dirname, "../public/account_verified.html"));
+      .sendFile(path.join(__dirname, "../pages/account_verified.html"));
   } catch (e) {
     res.status(400).json({ error: "e" });
   }
