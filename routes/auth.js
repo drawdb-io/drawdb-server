@@ -39,10 +39,13 @@ authRouter.post("/signup", async (req, res) => {
 
     await token.save();
 
-    const link = `${process.env.SERVER_URL}:${process.env.PORT}/confirm/${token.token}`;
+    const confirmLink = `${process.env.SERVER_URL}:${process.env.PORT}/confirm/${token.token}`;
+    const declineLink = `${process.env.SERVER_URL}:${process.env.PORT}/decline/${token.token}`;
     sendEmail(
       "Verify Email Address",
-      `<a href="${link}">Click to verify</a>`,
+      `<a href="${confirmLink}">Click to verify</a>
+      <br/>
+      <a href="${declineLink}">Click to decline</a>`,
       email,
       process.env.EMAIL_USER
     );
@@ -71,15 +74,37 @@ authRouter.get("/confirm/:token", async (req, res) => {
       { $set: { verified: true } }
     );
 
-    await TokenModel.findByIdAndRemove(token._id);
+    await TokenModel.findByIdAndDelete(token._id);
 
     res
       .status(200)
       .sendFile(path.join(__dirname, "../pages/account_verified.html"));
   } catch (e) {
+    res.status(500).sendFile(path.join(__dirname, "../pages/error.html"));
+  }
+});
+
+authRouter.get("/decline/:token", async (req, res) => {
+  try {
+    const token = await TokenModel.findOne({
+      token: req.params.token,
+    });
+
+    if (!token)
+      res.status(400).sendFile(path.join(__dirname, "../pages/error.html"));
+
+    const decryptedUserId = cryptr.decrypt(token.token);
+    if (decryptedUserId !== token.userId)
+      res.status(400).sendFile(path.join(__dirname, "../pages/error.html"));
+
+    await UserModel.findByIdAndDelete(token.userId);
+    await TokenModel.findByIdAndDelete(token._id);
+
     res
-      .status(500)
-      .sendFile(path.join(__dirname, "../pages/error.html"));
+      .status(200)
+      .sendFile(path.join(__dirname, "../pages/account_declined.html"));
+  } catch (e) {
+    res.status(500).sendFile(path.join(__dirname, "../pages/error.html"));
   }
 });
 
