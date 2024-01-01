@@ -7,6 +7,7 @@ const Cryptr = require("cryptr");
 const UserModel = require("../models/user");
 const TokenModel = require("../models/token");
 const sendEmail = require("../utils/sendEmail");
+const { emailVerificationTemplate } = require("../data/emailStyles");
 
 const cryptr = new Cryptr(process.env.ENCRYPTION_KEY);
 
@@ -39,15 +40,28 @@ authRouter.post("/signup", async (req, res) => {
 
     await token.save();
 
-    const confirmLink = `${process.env.SERVER_URL}:${process.env.PORT}/confirm/${token.token}`;
-    const declineLink = `${process.env.SERVER_URL}:${process.env.PORT}/decline/${token.token}`;
     sendEmail(
       "Verify Email Address",
-      `<a href="${confirmLink}">Click to verify</a>
-      <br/>
-      <a href="${declineLink}">Click to decline</a>`,
+      emailVerificationTemplate(username, token.token),
       email,
-      process.env.EMAIL_USER
+      process.env.EMAIL_USER,
+      [
+        {
+          filename: "logo_light_46.png",
+          path: path.join(__dirname, "../public/logo_light_46.png"),
+          cid: "logo",
+        },
+        {
+          filename: "discord.png",
+          path: path.join(__dirname, "../public/discord.png"),
+          cid: "discord",
+        },
+        {
+          filename: "twitter.png",
+          path: path.join(__dirname, "../public/twitter.png"),
+          cid: "twitter",
+        },
+      ]
     );
 
     res.status(200).json({ message: "Successfully sign up.", user: user });
