@@ -122,6 +122,69 @@ authRouter.get("/decline/:token", async (req, res) => {
   }
 });
 
+authRouter.post("/resend", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    let user = await UserModel.findOne({ email });
+
+    if (user && user.verified) {
+      res.status(400).json({ message: "Already verified." });
+    } else {
+      if (!user) {
+        const hashedPass = await bcrypt.hash(password, 12);
+
+        user = new UserModel({
+          username,
+          email,
+          password: hashedPass,
+          verified: false,
+        });
+
+        await user.save();
+
+        const token = new TokenModel({
+          userId: user._id.toString(),
+          token: cryptr.encrypt(user._id.toString()),
+        });
+
+        await token.save();
+      }
+
+      if (user && !user.verified) {
+        const token = await TokenModel.findOne({ userId: user._id });
+
+        if (token)
+          sendEmail(
+            "Verify Email Address",
+            emailVerificationTemplate(username, token.token),
+            email,
+            process.env.EMAIL_USER,
+            [
+              {
+                filename: "logo_light_46.png",
+                path: path.join(__dirname, "../public/logo_light_46.png"),
+                cid: "logo",
+              },
+              {
+                filename: "discord.png",
+                path: path.join(__dirname, "../public/discord.png"),
+                cid: "discord",
+              },
+              {
+                filename: "twitter.png",
+                path: path.join(__dirname, "../public/twitter.png"),
+                cid: "twitter",
+              },
+            ]
+          );
+      }
+      res.status(200).json({ message: "Successfully resent email." });
+    }
+  } catch (e) {
+    res.status(500).json({ error: e });
+  }
+});
+
 authRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
