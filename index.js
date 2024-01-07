@@ -40,12 +40,16 @@ const store = new mongoDbSession({
 app.use(express.json());
 app.use(bodyparser.json());
 app.use(express.static("public"));
-app.use(cors());
+app.use(
+  cors({
+    origin: CLIENT_URL,
+    credentials: true,
+  })
+);
 app.use(
   session({
-    name: "sid",
     cookie: {
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60 * 3,
       sameSite: true,
       secure: false,
     },
@@ -57,6 +61,16 @@ app.use(
 );
 app.use(authRouter);
 app.use(emailRouter);
+
+app.get("/sup", (req, res) => {
+  console.log(req.sessionID)
+  console.log(req.session.userId)
+  if (req.session.userId) {
+    res.status(200).json({ msg: "sup" });
+  } else {
+    res.status(400).json({ msg: "f u" });
+  }
+});
 
 server.listen(PORT, () => {
   console.log("Server started");

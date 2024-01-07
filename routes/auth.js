@@ -205,9 +205,15 @@ authRouter.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Incorrect password." });
     }
 
-    req.session.userId = user.id;
+    req.session.userId = user._id;
 
-    res.status(200).json({ session: req.session });
+    res
+      .status(200)
+      .json({
+        session: req.session,
+        email: user.email,
+        username: user.username,
+      });
   } catch (e) {
     res.status(500).json({ error: e });
   }
