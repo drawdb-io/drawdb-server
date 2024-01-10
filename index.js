@@ -1,7 +1,6 @@
 const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
-const server = require("http").createServer(app);
 const cors = require("cors");
 const bodyparser = require("body-parser");
 const session = require("express-session");
@@ -13,12 +12,6 @@ const authRouter = require("./routes/auth");
 const emailRouter = require("./routes/email");
 
 const { PORT, CLIENT_URL, MONGO_DB_URL, SECRET } = process.env;
-
-const io = require("socket.io")(server, {
-  cors: {
-    origin: [CLIENT_URL],
-  },
-});
 
 mongoose
   .connect(MONGO_DB_URL, {
@@ -63,8 +56,8 @@ app.use(authRouter);
 app.use(emailRouter);
 
 app.get("/sup", (req, res) => {
-  console.log(req.sessionID)
-  console.log(req.session.userId)
+  console.log(req.sessionID);
+  console.log(req.session.userId);
   if (req.session.userId) {
     res.status(200).json({ msg: "sup" });
   } else {
@@ -72,27 +65,45 @@ app.get("/sup", (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log("Server started");
 });
 
-users = {};
+const io = require("socket.io")(server, {
+  cors: {
+    origin: [CLIENT_URL],
+  },
+});
 
-io.on("connection", (socket) => {
-  socket.on("new-user", (name, color) => {
-    users[socket.id] = { name: name, color: color };
-    socket.broadcast.emit("user-connected", name);
-  });
+// users = {};
 
-  socket.on("send-message", (message) => {
-    io.emit("recieve-message", {
-      message: message,
-      id: socket.id,
-      ...users[socket.id],
-    });
-  });
+// io.on("connection", (socket) => {
+//   socket.on("new-user", (name, color) => {
+//     users[socket.id] = { name: name, color: color };
+//     socket.broadcast.emit("user-connected", name);
+//   });
 
-  socket.on("disconnect", () => {
-    socket.broadcast.emit("user-disconnected", users[socket.id].name);
+//   socket.on("send-message", (message) => {
+//     io.emit("recieve-message", {
+//       message: message,
+//       id: socket.id,
+//       ...users[socket.id],
+//     });
+//   });
+
+//   socket.on("disconnect", () => {
+//     socket.broadcast.emit("user-disconnected", users[socket.id].name);
+//   });
+// });
+
+io.on("connect", (socket) => {
+  socket.on("send-changes", (delta) => {
+    console.log(delta);
+    socket.broadcast.emit("recieve-changes", delta);
   });
+  socket.on("send-reversed-changes", (delta) => {
+    console.log(delta);
+    socket.broadcast.emit("recieve-reversed-changes", delta);
+  });
+  console.log("connected");
 });
