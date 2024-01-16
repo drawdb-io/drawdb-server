@@ -1,6 +1,6 @@
 const express = require("express");
 const sendEmail = require("../utils/sendEmail");
-const emailStyles = require("../data/emailStyles");
+const { emailStyles } = require("../data/emailStyles");
 
 const emailRouter = express.Router();
 
