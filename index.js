@@ -10,6 +10,8 @@ const mongoDbSession = require("connect-mongodb-session")(session);
 
 const authRouter = require("./routes/auth");
 const emailRouter = require("./routes/email");
+const sendEmail = require("./utils/sendEmail");
+const Cryptr = require("cryptr");
 
 const { PORT, CLIENT_URL, MONGO_DB_URL, SECRET } = process.env;
 
@@ -63,6 +65,23 @@ app.get("/sup", (req, res) => {
   } else {
     res.status(400).json({ msg: "f u" });
   }
+});
+
+const cryptr = new Cryptr(process.env.ENCRYPTION_KEY);
+
+app.post("/share", (req, res) => {
+  const { people, diagram } = req.body;
+  console.log(diagram)
+  const d = cryptr.encrypt(diagram);
+  people.forEach((p) => {
+    sendEmail(
+      "Invitation to collaborate",
+      `<a href="${CLIENT_URL}/editor/${d}">Open</a>`,
+      p,
+      process.env.EMAIL_USER
+    );
+  });
+  res.status(200).json({ msg: "hi" });
 });
 
 const server = app.listen(PORT, () => {
