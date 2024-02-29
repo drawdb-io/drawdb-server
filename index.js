@@ -11,13 +11,13 @@ const { PORT, CLIENT_URL } = process.env;
 app.use(express.json());
 app.use(bodyparser.json());
 app.use(express.static("public"));
-app.use(cors());
+app.use(
+  cors({
+    origin: [CLIENT_URL],
+  })
+);
 
 app.use(emailRouter);
-
-app.get("/sup", (req, res) => {
-  res.send("sup bud");
-});
 
 const server = app.listen(PORT, () => {
   console.log("Server started");
