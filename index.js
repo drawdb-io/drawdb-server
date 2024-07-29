@@ -5,13 +5,21 @@ const nodemailer = require("nodemailer");
 const bodyparser = require("body-parser");
 const dotenv = require("dotenv").config();
 
-const { PORT, CLIENT_URL, EMAIL_PASS, EMAIL_USER, EMAIL_REPORT } = process.env;
+const { PORT, CLIENT_URLS, EMAIL_PASS, EMAIL_USER, EMAIL_REPORT } = process.env;
+
+const whitelist = CLIENT_URLS.split(",");
 
 app.use(express.json());
 app.use(bodyparser.json());
 app.use(
   cors({
-    origin: [CLIENT_URL],
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
   })
 );
 
