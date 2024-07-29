@@ -1,14 +1,14 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Server that handles form submission for drawDB",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "dottle",
+  "author": "1ilit",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.0.1"
