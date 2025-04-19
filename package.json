@@ -17,9 +17,11 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@types/cors": "^2.8.17",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.1",
     "@types/node": "^22.14.1",
+    "@types/nodemailer": "^6.4.17",
     "eslint": "^9.25.0",
     "globals": "^16.0.0",
     "nodemon": "^3.1.9",
@@ -31,7 +33,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "nodemailer": "^6.9.5",
+    "nodemailer": "^6.10.1",
     "ts-node": "^10.9.2"
   }
 }
