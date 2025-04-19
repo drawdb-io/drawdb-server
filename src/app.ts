@@ -8,13 +8,15 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (origin && config.server.allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: config.dev
+      ? '*'
+      : (origin, callback) => {
+          if (origin && config.server.allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(null, false);
+          }
+        },
   }),
 );
 
