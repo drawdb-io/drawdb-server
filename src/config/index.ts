@@ -4,6 +4,9 @@ dotenvConfig();
 
 export const config = {
   dev: process.env.NODE_ENV === 'dev',
+  api: {
+    github: process.env.GITHUB_TOKEN,
+  },
   server: {
     port: process.env.PORT || 5000,
     allowedOrigins: process.env.CLIENT_URLS ? process.env.CLIENT_URLS.split(',') : [],
