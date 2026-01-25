@@ -340,13 +340,21 @@ async function compare(req: Request, res: Response) {
     const { id, file, versionA, versionB } = req.params;
 
     const dataA = await GistService.getCommit(id, versionA);
-    const dataB = await GistService.getCommit(id, versionB);
+    let dataB = {
+      files: {
+        [file]: { content: '' },
+      },
+    };
+
+    if (versionB !== 'null') {
+      dataB = await GistService.getCommit(id, versionB);
+    }
 
     res.status(200).json({
       success: true,
       data: {
-        contentA: dataA.files[file]?.content || null,
-        contentB: dataB.files[file]?.content || null,
+        contentA: dataA.files[file]?.content || '',
+        contentB: dataB.files[file]?.content || '',
       },
     });
   } catch (e) {
