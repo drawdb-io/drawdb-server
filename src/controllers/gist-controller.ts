@@ -338,4 +338,41 @@ async function getRevisionsForFile(req: Request, res: Response) {
   }
 }
 
-export { get, create, del, update, getCommits, getRevision, getRevisionsForFile };
+async function compare(req: Request, res: Response) {
+  try {
+    const { id, file, versionA, versionB } = req.params;
+
+    const dataA = await GistService.getCommit(id, versionA);
+    let dataB = {
+      files: {
+        [file]: { content: '' },
+      },
+    };
+
+    if (versionB !== 'null') {
+      dataB = await GistService.getCommit(id, versionB);
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        contentA: dataA.files[file]?.content || '',
+        contentB: dataB.files[file]?.content || '',
+      },
+    });
+  } catch (e) {
+    if ((e as AxiosError).status === 404) {
+      res.status(404).json({
+        success: false,
+        message: 'Gist or file not found',
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Something went wrong',
+      });
+    }
+  }
+}
+
+export { get, create, del, update, getCommits, getRevision, getRevisionsForFile, compare };
